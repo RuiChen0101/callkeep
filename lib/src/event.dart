@@ -21,7 +21,7 @@ abstract class EventType {
 ///  -- do something here
 /// });
 class EventManager {
-  Map<Type, List<dynamic>> listeners = <Type, List<dynamic>>{};
+  Map<Type, List<dynamic>> listeners = {};
 
   /// returns true if there are any listeners associated with the EventType for this instance of EventManager
   bool hasListeners(EventType event) {
@@ -43,8 +43,6 @@ class EventManager {
   ///  -- do something here
   /// });
   void on<T extends EventType>(T eventType, void Function(T event) listener) {
-    assert(listener != null, 'Null listener');
-    assert(eventType != null, 'Null eventType');
     _addListener(eventType.runtimeType, listener);
   }
 
@@ -53,7 +51,6 @@ class EventManager {
   /// all the methods that call it enforce the types!!!!
   void _addListener(Type runtimeType, dynamic listener) {
     assert(listener != null, 'Null listener');
-    assert(runtimeType != null, 'Null runtimeType');
     try {
       var targets = listeners[runtimeType];
       if (targets == null) {
@@ -87,6 +84,18 @@ class EventManager {
     if (!targets.remove(listener)) {
       print('Failed to remove any listeners for EventType $eventType');
     }
+  }
+
+  void removeAll<T extends EventType>(T eventType) {
+    final targets = listeners[eventType.runtimeType];
+    if (targets == null) {
+      return;
+    }
+    listeners.remove(eventType.runtimeType);
+  }
+
+  void clearAll<T extends EventType>(T eventType) {
+    listeners = {};
   }
 
   /// send the supplied event to all of the listeners that are subscribed to that EventType
