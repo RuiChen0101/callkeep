@@ -42,18 +42,19 @@ class EventManager {
   /// on(EventCallState(),(EventCallState event){
   ///  -- do something here
   /// });
-  void on<T extends EventType>(T eventType, void Function(T event) listener) {
-    _addListener(eventType.runtimeType, listener);
+  void on<T extends EventType>(T eventType, void Function(T event) listener,
+      {bool replace = false}) {
+    _addListener(eventType.runtimeType, listener, replace);
   }
 
   /// It isn't possible to have type constraints here on the listener,
   /// BUT very importantly this method is private and
   /// all the methods that call it enforce the types!!!!
-  void _addListener(Type runtimeType, dynamic listener) {
+  void _addListener(Type runtimeType, dynamic listener, bool replace) {
     assert(listener != null, 'Null listener');
     try {
       var targets = listeners[runtimeType];
-      if (targets == null) {
+      if (targets == null || replace) {
         targets = <dynamic>[];
         listeners[runtimeType] = targets;
       }
@@ -69,7 +70,7 @@ class EventManager {
     other.listeners.forEach((Type runtimeType, List<dynamic> otherListeners) {
       // ignore: avoid_function_literals_in_foreach_calls
       otherListeners.forEach((dynamic otherListener) {
-        _addListener(runtimeType, otherListener);
+        _addListener(runtimeType, otherListener, false);
       });
     });
   }
